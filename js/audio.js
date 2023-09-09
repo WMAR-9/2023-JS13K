@@ -19,7 +19,6 @@ const soundType = ["sine","square","sawtooth","triangle"]
 */
 
 
-
 const mainFreq = [0]
 
 /*
@@ -169,7 +168,6 @@ const startingNoteFrequency = 130.81
 for (let i = 0; i < 50; i++) {
     mainFreq.push(startingNoteFrequency * Math.pow(2, i / 12))
 }
-
 const songList = ["q","q"]
 const song1 = {
    "w":[
@@ -211,7 +209,7 @@ const song1 = {
                 1,0,1,2,0,3,
             ],.3,.01
         ],
-        [3,.5,1,[[0,2, 0, 0, 2, 0, 2,0,0,2]],[ 
+        [3,.5,1,[[0,2, 0, 0, 2, 0, 0,0,0,2]],[ 
             5,2,3,3,2,1,1,1,
             5,5,5,6,7,6,7,0,
             9,9,8,7,6,5,3,0,
