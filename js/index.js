@@ -29,16 +29,29 @@ const initial = _ =>{
 
     Player.lines = [findNodes(StartPlacement)]
     notesObject.push(Note)
-
     appendItem(gameObject,StartPlacement)
     appendItem(gameObject,Player)
 }
 
-// next level
+// next level create notes 
 const nextLevel = _ =>{
-    
+    if(KeyEvent){
+        playChord()
+    }
 }
 
+const NewGame=_=>{
+    GamePlayObject = []
+    CloudCreate(RandInt(3))
+    player = new Faller(tw/2,th/8,tw/16,th/16,10)
+    returnButton=null
+    startButton=null
+    level = 1
+    key1.p=0
+    key1.m=1
+    removetutorialTimes=0
+    CanPlaysong("song1")
+}
 
 // camera position and player 
 let centerPos = clone(Basic)
@@ -106,14 +119,7 @@ const render = s =>{
         if(e.mainFrame==playerPng){
 
             previousPlayerPos = clone(e)    
-            //console.log(e.lines[e.moveToPlacement])
-            // if(movementIndex&&!e.lines[e.moveToPlacement].type=='Node'){
-            //     console.log("Create > ",e.lines[e.moveToPlacement])
-            //     e.lines[e.moveToPlacement].created = 1
-            //     console.log("SET > ",e.lines[e.moveToPlacement].created)
-            //     //e.lines = e.lines[e.moveToPlacement].lines
-            //     console.log("Reset line > ",e.lines)
-            // }
+
             if(movementIndex){
                 gameObject.forEach(j=>{
                     if(j.pos.x<=e.pos.x+5&&j.pos.x>=e.pos.x-5
@@ -125,20 +131,21 @@ const render = s =>{
                         if(checkOnePoint){
                             j.remove()
                             e.lines=[checkOnePoint]
-
+                            movementIndex = 0
                         }else{
-
                             e.lines= j.lines
-
                         }
                     }
                 })
             }
         }
+        if(substract(Camera.pos,e.pos).x > quW){
+            e.remove()
+        }
         e.update(s)
         e.render()
     })
-    Player.render()
+    
 }
 
 const notesrender = s => {
@@ -162,7 +169,11 @@ const loop = _ =>{
     const w = canvas.width = 1024
     const h = canvas.height = 800
     ctx.clearRect(0,0,w,h)
-
+    
+    // if(KeyEvent){
+    //     playChord()
+    // }
+    
     // game start view
     // start View index = 1  > start
 
@@ -212,13 +223,15 @@ const loop = _ =>{
 
         canvasRestore()
     }
+    if(!notesObject.length){
+        movementIndex=1
+    }
     // --------
 
     requestAnimationFrame(loop)
 }
 
 
-
 initial()
-//playSound(song1[songList[index]])
+
 loop()

@@ -1,4 +1,5 @@
 const backgroundTileColor = ['#90ea8c', '#6cdf69', '#a48652', '#80b67e', '#10740c', '#c0ad6c', '#33944d']
+
 // empty, little grass, grass, flower, circle place,path1, path2, 
 // 0-3 , 
 // 4-6 PATH

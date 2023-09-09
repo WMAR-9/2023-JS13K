@@ -1,16 +1,12 @@
+let audioCtx = null
 
-let audioCtx = null;
-
-const initAudioContext=_=>{
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-}
-
+const initialAudioCtx = _ =>(audioCtx=new (window.AudioContext || window.webkitAudioContext)())
 
 let oscillators = []
 let isPlaying = false
 let index = 0
-// 0 - 4
 
+// 0 - 4 
 const soundType = ["sine","square","sawtooth","triangle"]
 
 /*
@@ -18,56 +14,21 @@ const soundType = ["sine","square","sawtooth","triangle"]
     tempo = current length / main notes length
 */
 
-
 const mainFreq = [0]
 
-/*
-12: C4
-13: C#4 / Db4
-14: D4
-15: D#4 / Eb4
-16: E4
-17: F4
-18: F#4 / Gb4
-19: G4
-20: G#4 / Ab4
-21: A4
-22: A#4 / Bb4
-23: B4
-24: C5
-25: C#5 / Db5
-26: D5
-27: D#5 / Eb5
-28: E5
-29: F5
-30: F#5 / Gb5
-31: G5
-32: G#5 / Ab5
-33: A5
-34: A#5 / Bb5
-35: B5
-36: C6
-*/
+const startingNoteFrequency = 130.81
 
-/*
-  C大三和弦
-  F大三和弦
-  G大三和弦
-  E小三和弦
-  D小三和弦
-  E小三和弦
-  F小三和弦
-  A小三和弦
-*/
-/**
- * 
-    // C大五和弦
-    // D大五和弦
-    // E大五和弦
-    // G大五和弦
-    // A大五和弦
+for (let i = 0; i < 50; i++) {
+    appendItem(mainFreq,(startingNoteFrequency * math.pow(2, i / 12)))
+}
 
- */
+
+const triad = [
+    [0,13, 17, 20, 18, 15, 18, 20, 17],
+    [0,15, 20, 22, 20, 17, 20, 22, 18],
+    [0,17, 22, 25, 22, 18, 22, 24, 20]
+]
+
 const fifthChord = [
         [0,13, 15, 17, 20, 22],
         [0,17, 19, 21, 24, 26],
@@ -75,11 +36,7 @@ const fifthChord = [
         [0,24, 26, 28, 31, 33],
         [0,27, 29, 31, 34, 36]
 ]; 
-const triad = [
-    [0,13, 17, 20, 18, 15, 18, 20, 17],
-    [0,15, 20, 22, 20, 17, 20, 22, 18],
-    [0,17, 22, 25, 22, 18, 22, 24, 20]
-]
+
 
 let test = [
     5, 3, 0, 5, 3, 2, 1, 2, 3, 0,
@@ -97,93 +54,44 @@ let test = [
 //     1,1,5,5,6,6,5,
 //     4,4,3,3,2,2,1
 // ];
-// test =  [
-//     1,1,5,5,6,6,5,0,
-//     4,4,3,3,2,2,1,0,
-//     5,5,4,4,3,3,2,0,
-//     5,5,4,4,3,3,2,0,
-//     1,1,5,5,6,6,5,0,
-//     4,4,3,3,2,2,1,0
-// ]
-// test = [
-//     1,2,3,1,1,2,3,1,0,
-//     3,4,5,0,3,4,5,0,
-//     5,6,5,4,3,5,6,5,4,3,
-//     1,6,1,0,1,6,1,0
-// ]
+test =  [
+    1,1,5,5,6,6,5,0,
+    4,4,3,3,2,2,1,0,
+    5,5,4,4,3,3,2,0,
+    5,5,4,4,3,3,2,0,
+    1,1,5,5,6,6,5,0,
+    4,4,3,3,2,2,1,0
+]
+test = [
+    1,2,3,1,1,2,3,1,0,
+    3,4,5,0,3,4,5,0,
+    5,6,5,4,3,5,6,5,4,3,
+    1,6,1,0,1,6,1,0
+]
+// walk 
+test = [
+    1,2,0,2,1,0
+]
 const test1 = [
 	1,0,5,0,4,0,5,
 	2,0,5,0,1,0,4,
 	0,2,0,3,0,1,1,
 ]
 
-/**
- * 1
- *  G,E,0,G,E,D,C,D,E,0
-    G,0,E,0,G,E,D,C,D,E
-    G,0,E,G,E,D,C,0,D,E
-    G,0,E,G,E,D,C,0,D,E
-    C,D,E,D,C,B,0,A,B,0
-    G,0,A,B,A,G,F,G,A,0
-
- * 3
-  "Am" A2 A B2 A G2 | "E7" F2 F E2 D E2 | "Am" A2 A B2 A G2 | "E7" F2 E D3 E F |
-  "Am" E2 F G2 E F2 | "Dm" G2 F E3 D F | "E7" E3 D E2 F G2 | "Am" A3 -A3 |
-  "Am" A2 A B2 A G2 | "E7" F2 F E2 D E2 | "Am" A2 A B2 A G2 | "E7" F2 E D3 E F |
-  "Am" E2 F G2 E F2 | "Dm" G2 F E3 D F | "E7" E3 D E2 F G2 | "Am" A3 -A3 |
- * 
-  4 
-    G4 E4 D4 G4 
-    D4 E4 G4 C4 
-    G4 B4 A4 F4 
-    E4 D4 G4 G4
- */
-/**
-find freq in main Freq
- * 
-const row = []
-const tempa = [
-    [261.63,293.66,329.63,349.23,392.00,440.00],
-    [261.63,293.66,329.63,349.23,392.00,440.00],
-]
-tempa.forEach(e=>{
-    const temp = []
-    e.forEach(j=>{
-        mainFreq.forEach((k,i)=>{
-        if(Math.round(e)==Math.round(k)){
-            temp.push(i)
-            console.log(i,e,k)
-        }
-        })
-    })
-    row.push(temp)
-})
-row
- * 
- */
-// c4 261.63 index 12, C2 65.41 ,c3 130.81 0
-
-const startingNoteFrequency = 130.81
-
-for (let i = 0; i < 50; i++) {
-    mainFreq.push(startingNoteFrequency * Math.pow(2, i / 12))
-}
-
-const songList = ["w","w"]
+const songList = ["w","q","w","q","w","q","w","q",]
+const songList1 = ["q","q"]
 
 const song1 = {
    "w":[
-        [0,.5,1,[
-            [0,12, 14, 16, 17, 19, 21,22]
-        ],test,1,.001
+        [3,.5,1,[
+            [0,1, 2]
+        ],test,.3,.001
         ],
-        // [
-        //     3,1,1,triad,[
-        //         1,0,1,2,0,3,
-        //         0,4,0,3,1,2,
-        //         0,3,0,1,5,1
-        //        ],.3,.01
-        // ]
+        [
+            0,1,1,triad,[
+                1,0,0
+            ],.3,.01
+        ]
     ],
     "q":[
         [0,.5,.5,[
@@ -229,33 +137,27 @@ const song1 = {
     ],
 }
 
-let currentNote = {}
-
 const soundInitial = _ => (oscillators.forEach(oscillator => oscillator.forEach(e => e.stop())), []);
 
-const playSound = (song) =>{
+
+const playSound = song =>{
     if(isPlaying)return
     oscillators = soundInitial()
     isPlaying=true
-
+    audioCtx?0:initialAudioCtx()
     console.log(`canloop: song>`,song)
-    
-    if(!audioCtx) {
-        initAudioContext()
-    }
-
-    currentNote = {}
 
     song.forEach((e,i)=>{
+        
         const type = soundType[e[0]]
         const notes = e[4]
         const duration = e[2]
         const rythm = e[1]
         const volume = e[5]
         const temp = []
+
         let time = audioCtx.currentTime
 
-        console.log(`index ${i} time:`,time)
         notes.forEach(k=>{
 
             e[3].forEach(l=>{
@@ -310,6 +212,7 @@ const stopChord=_=>{
         isPlaying = true
     }
 }
+//playSound(song1[songList1[index]],audioCtxBackgroud)
 
 const nextChord=_=>{
     //oscillators = soundInitial()
@@ -317,6 +220,69 @@ const nextChord=_=>{
     isPlaying = false;
     index++
     playSound(song1[songList[index]])
+}
+
+let audioContext = null
+const sampleRate = 44600
+
+const createPcmData=(frequencyStart, frequencyEnd, attackTime, decayTime, sustainLevel, releaseTime, duration, volume)=>{
+    const numSamples = floor(sampleRate * duration);
+    const pcmData = new Float32Array(numSamples);
+  
+    for (let i = 0; i < numSamples; i++) {
+      const t = i / sampleRate;
+      const frequency = frequencyStart +(frequencyEnd - frequencyStart) * (i / numSamples);
+      let envelope
+      if (t < attackTime) {
+        envelope = t / attackTime
+      } else if (t < attackTime + decayTime) {
+        envelope = 1 - (1 - sustainLevel) * ((t - attackTime) / decayTime)
+      } else if (t < attackTime + decayTime + duration - releaseTime) {
+        envelope = sustainLevel
+      } else {
+        envelope = sustainLevel * (1 - (t - attackTime - decayTime - duration + releaseTime) / releaseTime); // 释放阶段
+      }
+      const sampleValue = envelope * volume * math.sin(2 * PI * frequency * t);
+  
+      pcmData[i] = sampleValue;
+    }
+  
+    return pcmData;
+}
+
+// 配置參數
+// const noteFrequencyStart =  mainFreq[2]   //698.46; // 起始音符的頻率（DO）
+// const noteFrequencyEnd = mainFreq[3]; // 目標音符的頻率（RE）
+// const attackTime = 1 // 攻擊時間（秒）
+// const decayTime = 1; // 衰減時間（秒）
+// const sustainLevel = 0; // 持續水平
+// const releaseTime = .5; // 释放時間（秒）
+// const noteDuration = .1 // 音符總持續時間（秒）
+// const volume = .1; // 音量
+
+const rightPcmData =createPcmData(mainFreq[5], mainFreq[7], .1,.1,0, .1,.3,.1)
+const leftPcmData =createPcmData(mainFreq[7], mainFreq[5], .1,.1,0, .1,.3,.1)
+function playPcmData(pcmData) {
+
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  let audioBuffer = audioContext.createBuffer(1, pcmData.length, sampleRate);
+  audioBuffer.copyToChannel(pcmData, 0);
+
+  let source = audioContext.createBufferSource();
+  source.buffer = audioBuffer;
+  source.connect(audioContext.destination);
+  source.start();
+  source.onended=_=>{
+    source.stop()
+    source.disconnect()
+    source.buffer = null;
+    source = null;
+    audioBuffer= null
+  }
+}
+
+const play=i=>{
+    playPcmData(i?leftPcmData:rightPcmData);
 }
 
 /**
@@ -493,45 +459,5 @@ ANS ::
 
 
 3 song 
-
-
- * 
-1. 130.81 Hz - C3
-2. 138.59 Hz - C#3/Db3
-3. 146.83 Hz - D3
-4. 155.56 Hz - D#3/Eb3
-5. 164.81 Hz - E3
-6. 174.61 Hz - F3
-7. 184.99 Hz - F#3/Gb3
-8. 195.99 Hz - G3
-9. 207.65 Hz - G#3/Ab3
-10. 219.99 Hz - A3
-11. 233.08 Hz - A#3/Bb3
-12. 246.94 Hz - B3
-13. 261.62 Hz - C4
-14. 277.18 Hz - C#4/Db4
-15. 293.66 Hz - D4
-16. 311.12 Hz - D#4/Eb4
-17. 329.62 Hz - E4
-18. 349.22 Hz - F4
-19. 369.99 Hz - F#4/Gb4
-20. 391.99 Hz - G4
-21. 415.30 Hz - G#4/Ab4
-22. 439.99 Hz - A4
-23. 466.15 Hz - A#4/Bb4
-24. 493.87 Hz - B4
-25. 523.24 Hz - C5
-26. 554.35 Hz - C#5/Db5
-27. 587.32 Hz - D5
-28. 622.24 Hz - D#5/Eb5
-29. 659.24 Hz - E5
-30. 698.44 Hz - F5
-31. 739.97 Hz - F#5/Gb5
-32. 783.97 Hz - G5
-33. 830.59 Hz - G#5/Ab5
-34. 879.98 Hz - A5
-35. 932.31 Hz - A#5/Bb5
-36. 987.75 Hz - B5
-37. 1046.48 Hz - C6
 
 */

@@ -7,9 +7,7 @@ const l = window.localStorage;
 const timer = performance
 const initialXY = reXY(0,0)
 
-let gameObject = mapLayer= notesObject = []
-
-let KeyIn = [],KeyEvent=0,second=0
+let gameObject = mapLayer= notesObject = [],second=0
 
 const speedStep = 1,speed = 50
 
@@ -115,8 +113,9 @@ const Line = clone(Basic)
 const Tilemap = clone(Basic)
 const Camera = clone(Basic)
 const Player = clone(Basic)
-
-
+const Button = clone(Basic)
+const Note = clone(Basic)
+const Aim = clone(Basic)
 
 Tilemap.mainFrame = backgroundMap
 Tilemap.update=function(e){
@@ -128,18 +127,9 @@ Placement.mainFrame = pathPng
 Placement.created= 0
 Placement.type = "Node"
 Placement.initial()
-// Placement.render = function(e){
-//     canvasSave()
-//     canvasDraw(this.mainFrame[0],this.pos,this.wh)
-//     canvasstrokeStyle("#333")
-//     canvasstrokeRect(this.pos,this.wh)
-//     canvasRestore()
-// }
 
 Line.mainFrame = pathPng
 Line.initial()
-// Line.render = function(e){
-// }
 
 Player.mainFrame = playerPng
 
@@ -168,24 +158,6 @@ Player.update=function(s){
 
     this.vpos = dot(this.vpos,s*speed*.04)
     this.pos = add(this.pos,this.vpos)
-    KeyIn.forEach(e=>{
-        if(e==37){
-            movementIndex = 1
-            //console.log(movementIndex)
-            // this.vpos = add(reXY(-speedStep,0),this.vpos)
-        }
-        if(e==38){
-            movementIndex = 0
-            // this.vpos = add(reXY(0,-speedStep),this.vpos)
-        }
-        if(e==39){
-           // this.vpos = add(reXY(speedStep,0),this.vpos)
-        }
-        if(e==40){
-            // this.vpos = add(reXY(0,speedStep),this.vpos)
-        }
-    }) 
-
 }
 
 Camera.update=function(e){
@@ -194,6 +166,17 @@ Camera.update=function(e){
     this.pos = add(this.pos,this.vpos)
 }
 Camera.render=_=>{}
+
+
+
+
+
+
+
+
+
+
+
 
 //  random gen background 
 const generateTilemap = (pos,rate=[.8,.2]) =>{

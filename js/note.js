@@ -1,5 +1,4 @@
-const Note = clone(Basic)
-const Aim = clone(Basic)
+
 
 Aim.mainFrame = pathPng
 Aim.frameIndex = 0
@@ -26,3 +25,6 @@ Note.update = function(e){
 Note.remove = function(){
     notesObject = removeItem(notesObject,this)
 }
+
+Button.wh =  reXY(20,20)
+Button.mainFrame = pathPng

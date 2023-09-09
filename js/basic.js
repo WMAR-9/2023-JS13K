@@ -29,6 +29,7 @@ const add = (a,b) =>reXY(a.x+b.x,a.y+b.y)
 const dot=(a,b)=>reXY(a.x*b,a.y*b)
 const substract=(a,b)=>reXY(a.x-b.x,a.y-b.y)
 const comp=(a,b)=>a.x==b.x&&a.y==b.y
+const collisionRect=(a,as,b,bs)=>(a.x+as.x>b.x&&b.x+bs.x>a.x&&a.y+as.y>b.y&&b.y+bs.y>a.y)?1:0
 const clone = a =>{
     if (a === null || typeof a !== 'object' || a instanceof Image) {
         return a;
