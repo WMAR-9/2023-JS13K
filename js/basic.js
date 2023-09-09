@@ -30,7 +30,7 @@ const dot=(a,b)=>reXY(a.x*b,a.y*b)
 const substract=(a,b)=>reXY(a.x-b.x,a.y-b.y)
 const comp=(a,b)=>a.x==b.x&&a.y==b.y
 const clone = a =>{
-    if (a === null || typeof a !== 'object') {
+    if (a === null || typeof a !== 'object' || a instanceof Image) {
         return a;
     }
     const b = Array.isArray(a)?[]:{};
@@ -39,7 +39,22 @@ const clone = a =>{
     }
     return b;
 }
-const distance=(a,b)=>math.hypot(a,b);
+
+const distance=(a,b)=>math.hypot(a.x-b.x,a.y-b.y);
 const removeItem = (a,b)=>a.filter(e=>e!=b)
 const appendItem = (a,b)=>(a.push(b),a)
 
+const randWeight = (values, weights) => {
+    
+    const random = Math.random();
+    let cumulativeWeight = 0;
+  
+    for (let i = 0; i < values; i++) {
+      cumulativeWeight += weights[i];
+      if (random < cumulativeWeight) {
+        return i;
+      }
+    }
+
+    return values;
+};

@@ -7,16 +7,13 @@ const l = window.localStorage;
 const timer = performance
 const initialXY = reXY(0,0)
 let gameObject = []
-let KeyIn = [],KeyEvent=0,second=0
-const speedStep = 1,speed = 45
-const nodeRadius = 20;
-const columnSpacing = 40;
-const rowSpacing = 40;
-const numRows = 5;
-const numColumns = 7;
-let halfW=canvas.width = 500
-let halfH=canvas.height = 500
 
+let KeyIn = [],KeyEvent=0,second=0
+
+const speedStep = 1,speed = 45
+
+const halfW=canvas.width = 1024
+const halfH=canvas.height = 1024
 
 // Draw Image  ( Main ) 
 const canvasDraw=(f,a,b)=>ctx.drawImage(f,a.x,a.y,b.x,b.y)
@@ -61,6 +58,7 @@ const Line = clone(Basic)
 const Tilemap = clone(Basic)
 const Camera = clone(Basic)
 const Player = clone(Basic)
+
 Node.main = "node"
 Node.lines = []
 Node.create= 0
@@ -72,53 +70,51 @@ Node.draw = function(e){
     canvasstrokeRect(this.pos,this.wh)
     canvasRestore()
 }
-// Node.update = function(s){
-//     this.vpos = dot(this.vpos,-1)
-// }
-Tilemap.main='lineAA'
-Tilemap.frame = randInt(3)
+
+Tilemap.frameIndex = 0
+Tilemap.mainFrame = tiles(backGround,3,backgroundTileColor,8)
+
 Tilemap.draw=function(e){
     canvasSave()
-    //canvasFillStyle("#0f0")
-    // canvasstrokeStyle("#000")
-    // canvasstrokeRect(this.pos,this.wh)
-    canvasDraw(this.frame,this.pos,this.wh)
+    canvasDraw(this.mainFrame[this.frameIndex],this.pos,this.wh)
     canvasRestore()
 }
 Tilemap.update=function(e){
     this.vpos = dot(this.vpos,-e*speed)
     this.pos = add(this.vpos,this.pos)
 }
-Line.epos = set(initialXY)
-Line.frame = randInt(3)
+
+
+// Line.epos = set(initialXY)
+// Line.frame = randInt(3)
 // Line.update=function(s){
 //     this.vpos = dot(this.vpos,-1)
 // }
-console.log(backGround[4])
-let pathImage =[rotateImage(createPath(backGround[4],3,backgroundTileColor,8),90),createPath(backGround[1],3,backgroundTileColor,8),createPath(backGround[3],3,backgroundTileColor,8)]// [createPath(backGround[4],3,backgroundTileColor,8),createPath(backGround[3],3,backgroundTileColor,8),createPath(backGround[5],3,backgroundTileColor,8)]
+//console.log(backGround[4])
+//let pathImage =[rotateImage(createPath(backGround[2],3,backgroundTileColor,8),90),createPath(backGround[2],3,backgroundTileColor,8),createPath(backGround[3],3,backgroundTileColor,8)]// [createPath(backGround[4],3,backgroundTileColor,8),createPath(backGround[3],3,backgroundTileColor,8),createPath(backGround[5],3,backgroundTileColor,8)]
 
-Line.draw = function(e){
-    const pxy = this.pos
-    const vxy = this.epos
-    const halfH = this.wh.y/2
-    const halfW = this.wh.x/2
-    const temp = reXY(pxy.x+halfW,pxy.y+halfH)
-    const arcTo = reXY(pxy.x,vxy.y+halfH)
-    const dest = reXY(vxy.x+halfW,vxy.y+halfH)
-    //console.log(temp,arcTo,dest)
-    canvasSave()
-    const pattern = ctx.createPattern(pathImage[this.frame],'repeat');
-    ctx.lineWidth=16
-    canvasstrokeStyle(pattern)
-    canvasBegin()
-    canvasMoveTo(temp)
-    canvasArcTo(arcTo,dest,this.angle)
-    canvasLineTo(dest)
-    canvasStroke()
-    canvasClose()
-    canvasRestore()
+// Line.draw = function(e){
+//     const pxy = this.pos
+//     const vxy = this.epos
+//     const halfH = this.wh.y/2
+//     const halfW = this.wh.x/2
+//     const temp = reXY(pxy.x+halfW,pxy.y+halfH)
+//     const arcTo = reXY(pxy.x,vxy.y+halfH)
+//     const dest = reXY(vxy.x+halfW,vxy.y+halfH)
+//     //console.log(temp,arcTo,dest)
+//     canvasSave()
+//     const pattern = ctx.createPattern(pathImage[this.frame],'repeat');
+//     ctx.lineWidth=16
+//     canvasstrokeStyle(pattern)
+//     canvasBegin()
+//     canvasMoveTo(temp)
+//     canvasArcTo(arcTo,dest,this.angle)
+//     canvasLineTo(dest)
+//     canvasStroke()
+//     canvasClose()
+//     canvasRestore()
 
-}
+// }
 
 Player.update=function(s){
     KeyIn.forEach(e=>{
@@ -184,7 +180,7 @@ Camera.draw=function(){
 }
 Camera.update=function(s){
     this.vpos = substract(this.vpos,this.pos)
-    this.vpos = dot(this.vpos,s*speed*.1)
+    this.vpos = dot(this.vpos,s*5)
     this.pos = add(this.pos,this.vpos)
 }
 
@@ -234,9 +230,9 @@ const findNodes = node =>{
         return cl
     }
 }
-testa = rotateImage(createPath(backGround[3],3,backgroundTileColor,8),25)
+testa = tiles(pathTile,3,backgroundTileColor,8)[0]//rotateImage(createPath(backGround[0],3,backgroundTileColor,8),0)
 let destinationValue = null
-let drawPos = clone(Basic);
+// let drawPos = clone(Basic);
 const render = s =>{
     const canvasWidth = canvas.width
     const canvasHeight = canvas.height
@@ -259,8 +255,8 @@ const render = s =>{
                 tMap.pos = reXY(k.pos.x,mapLayer[lastX][0].pos.y+32)
                 tMap.wh = reXY(size,size)
                 tMap.main= "Map"
-                tMap.frame = testa
-                console.log(mapLayer[lastX][0].pos.y)
+                tMap.frame = testax
+                //console.log(mapLayer[lastX][0].pos.y)
                 temp.push(tMap)
             })
             mapLayer.shift()
@@ -317,40 +313,6 @@ const render = s =>{
                 }
             })
         }
-
-        // if(e.main=="Map"){
-        //     if(destinationValue.pos.x-e.pos.x>halfW/4){
-        //         const size = 32
-        //         const tMap = clone(Tilemap)
-        //         tMap.pos = reXY(e.pos.x+halfW/4,e.pos.y)
-        //         tMap.vpos = reXY(0,0)
-        //         tMap.wh = reXY(size,size)
-        //         tMap.main= "Map"
-        //         tMap.frame =testa
-        //         console.log(gameObject)
-        //         //gameObject.push(tMap)
-        //         gameObject=removeItem(gameObject,e)
-        //     }else if(destinationValue.y-e.pos.y>halfH/4){
-        //         const size = 32
-        //         const tMap = clone(Tilemap)
-        //         tMap.pos = reXY(e.pos.x,destinationValue.y+halfH/4)
-        //         tMap.wh = reXY(size,size)
-        //         tMap.main= "Map"
-        //         tMap.frame = testa//createPath(randIntBetween(4,7),1,size,size)
-        //         //gameObject.push(tMap)   
-        //         gameObject=removeItem(gameObject,e)
-        //     }   
-        // }
-        // if(e.lines && e.pos.y>250-drawPos.pos.y|0){
-        //     const cl = clone(Line)
-        //     cl.wh = reXY(20,20)
-        //     cl.pos =  set(e.pos)
-        //     cl.epos = reXY(e.pos.x,e.pos.y-50)
-        //     gameObject.push(cl)
-        //     createNode(gameObject,cl,100,50,2)
-        //     e.lines = 1
-        // }
-        
         
         e.update(s)
         e.draw(screenX)
@@ -364,9 +326,10 @@ const loop = _ =>{
     const deltaMs = now - second;
     const delta = deltaMs / 1000;
     second = now;
-    const w = canvas.width = 512
-    const h = canvas.height = 500
+    const w = canvas.width = 1024
+    const h = canvas.height = 800
     ctx.clearRect(0,0,w,h)
+
     canvasSave()
     ctx.scale(2,2)
     render(delta)
@@ -378,9 +341,9 @@ const loop = _ =>{
 
 // --------- Test
 
-Line.wh = reXY(20,20)
-Line.pos =  reXY(halfW/8,halfH/8)
-Line.epos = reXY(halfW/8+50,halfH/8)
+// Line.wh = reXY(20,20)
+// Line.pos =  reXY(halfW/8,halfH/8)
+// Line.epos = reXY(halfW/8+50,halfH/8)
 Player.pos = reXY(halfW/8,halfH/8)
 Player.wh = reXY(30,30)
 Player.main = "Player"
@@ -389,7 +352,7 @@ Camera.main = "camera"
 //console.log(Camera)
 gameObject.push(Camera)
 gameObject.push(Player)
-gameObject.push(Line)
+//gameObject.push(Line)
 const size = 32
 const testW = halfW/size/2,testH = halfH/size/2
 var X = 0,Y=0
@@ -401,7 +364,7 @@ for(var j =0;j<=testH+2;j++){
         tMap.vpos = reXY(0,0)
         tMap.wh = reXY(size,size)
         tMap.main= "Map"
-        tMap.frame = createPath(backGround[3],3,backgroundTileColor,8)
+        tMap.frame = ///createPath(backGround[3],3,backgroundTileColor,8)
         temp.push(tMap)
     }
     mapLayer.push(temp)
