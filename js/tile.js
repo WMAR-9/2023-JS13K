@@ -2,77 +2,73 @@
  Basic function decode string to array to tile
 */
 
-const tiles = (a,bit,color,w,t=0)=>{
-    const b = []
-    a.forEach(e=>{
-        b.push(tilePng(e,bit,color,w,t))
-    })
-    return b
-}
+// const tiles = (a,bit,color,w,t=0)=>{
+//     const b = []
+//     a.forEach(e=>{
+//         b.push(tilePng(e,bit,color,w,t))
+//     })
+//     return b
+// }
 
-const tilePng = (item,bit,color,w,t=0) =>{
+// const tilePng = (item,bit,color,w,t=0) =>{
 
-    var arr = t?item:string2Array(item,bit)
-    var b = doc.createElement('canvas')
-    var ctx1 = getContext(b)
+//     var arr = t?item:string2Array(item,bit)
+//     var b = doc.createElement('canvas')
+//     var ctx1 = getContext(b)
 
-    const size = 16
+//     const size = 16
 
-    const widthSize = w*size
-    b.width = widthSize
-    b.height = widthSize
-    ctx1.clearRect(0,0,widthSize,widthSize)
-    for (let i = 0; i < w; i++) {
-      for (let j = 0; j < w; j++) {
-        const value = arr[i* w + j];
-        const x = j * size;
-        const y = i * size;
-        if(value<color.length){
-          ctx1.fillStyle = "#"+color[value]
-          ctx1.fillRect(x, y, size, size);
-        }
-      }
-    }
+//     const widthSize = w*size
+//     b.width = widthSize
+//     b.height = widthSize
+//     ctx1.clearRect(0,0,widthSize,widthSize)
+//     for (let i = 0; i < w; i++) {
+//       for (let j = 0; j < w; j++) {
+//         const value = arr[i* w + j];
+//         const x = j * size;
+//         const y = i * size;
+//         if(value<color.length){
+//           ctx1.fillStyle = "#"+color[value]
+//           ctx1.fillRect(x, y, size, size);
+//         }
+//       }
+//     }
 
-    let basicImage = createImg();
-    basicImage.src = toPng(b);
-    return basicImage;
-}
+//     let basicImage = createImg();
+//     basicImage.src = toPng(b);
+//     return basicImage;
+// }
 
-// Rotate Frame
-const rotateImage=(image, angle)=>{
+// // Rotate Frame
+// const rotateImage=(image, angle)=>{
 
-    var canvas = doc.createElement('canvas');
-    var ctx = getContext(canvas);
+//     var canvas = doc.createElement('canvas');
+//     var ctx = getContext(canvas);
 
-    var width = image.width;
-    var height = image.height;
-    var radians = (angle * Math.PI) / 180;
+//     var width = image.width;
+//     var height = image.height;
+//     var radians = (angle * Math.PI) / 180;
 
-    canvas.width = width;
-    canvas.height = height;
+//     canvas.width = width;
+//     canvas.height = height;
 
-    ctx.translate(width / 2, height / 2);
-    ctx.rotate(radians);
-    ctx.drawImage(image, -width / 2, -height / 2);
+//     ctx.translate(width / 2, height / 2);
+//     ctx.rotate(radians);
+//     ctx.drawImage(image, -width / 2, -height / 2);
 
-    let rotatedImage = createImg();
-    rotatedImage.src = toPng(canvas);
-    return rotatedImage;
-}
+//     let rotatedImage = createImg();
+//     rotatedImage.src = toPng(canvas);
+//     return rotatedImage;
+// }
 
 const backgroundTileColor = ['90ea8c', '6cdf69', 'a48652', '80b67e', '10740c', 'c0ad6c', '33944d']
 
 // empty, little grass, grass, flower, circle place,path1, path2, 
 // 0-3 , 
 // 4-6 PATH
+
 const backGround =  ['𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶','𦶶𶶶𶶶𶶶𶶴𶶦𶶶𶶶𶦶𶶶ප', '𶶶𶶶鶶𶶶𶱌𴦶𶉶𡎶𦶶𶶴බ','𶶶𶶶𶶞𳃶𞶶𶶶𶶶𶶶𶶞𳃶බ']
 const pathTile = ['𮵳𬶶򭶥𵪒𪛕򛕶򒭵𦵪𶴭󵶮', '𞶶𜦶𬤤𕭭𭪭𭭭𬭭𭕭𤤦𳶜බ', '𶶶󤤞𭮤𬭭𭪭𭭭𭭕𤭭𤣤𶶶ƶ']
-
-const playerColor = ['2d2d36', 'f2d55e', '4a4a56', '682921', '541b14', '666671', '272736', '000000']
-const palyerTile = [
-  "񊔩񊔩񊔩񊔩񊔩𱤩񊓆񊔩񊔩𩓉񉢥񊔩񊔩𩒦񉠥񊔩񊔩𩒦񉠡񊔩񊔩𩒦񉠥񊔩񊔩𩓆񉢥񊔩𲔩𠱤񉂃񊔩𚔩𡂃񉂄񊔩𘴩𨡄񉢥񊔩𘴩𨡆񉢥񊔩𡁩𸀆񉣧񊔩𡁣𨡆񊓅񊔩񈱣𱓆񊓅񊔩񊒄𱓉񊓅񊔩񊑣𱣉񊓆񊔩"
-]
 
 
 // 5 bits
@@ -102,6 +98,7 @@ const spider = [
   "𿿿𿻿𧿿🿼𿿿𧼿𧻿𿿼󼿿𤿧󟿿鈸𼧭󣿟𭭯𿟿򭫭𿭍𭭿򒕭𯿽򭭭󿪒𫭿𩩭𻿽𯜟𿭭𻟿𭼼𿤽🧿𤿧𿧿𿟼𿿤𿤿𿻿𿿿𿿿𿿟ǿ",
   "𿿿𿟿𿿿󿿿𿿿𼧿𤻿𿿼🧼𧿧𿿼𼼿𧽭𛟼𭯜󿿭𭝯𭕅𭿿򕭭𿽒𭭯銭𻿽񭫭𿭍󧫿𭭯𿿿𼼧𧽭𼿼𿧟𿼧󿿤𿤧𿿿𻿿𿿿𿿿𿟿࿿"
 ]
+
 const rightAndLeftColor =['1c1c39', '606070', 'ed9829', 'f3d748', '43434f', '000000']
 const rightAndLeft = [
   "𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶒤𶶶󡦶𶶒񦶶𒛌𶶶󉡦𶒛񤶶򛛉𶶶󙉤𶲛񡦶𒛙𶶶󙡦𶶒񦶶𶒜𶶶򔦶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶",
@@ -114,6 +111,10 @@ const snake = [
   "򪪪򪪪򪪪򪪪򪪪򪪪򊪪򪪇򪪪򊪪򨢃򪪪򪪪񶡨򪪨򪪪򊪪򪞈򪪪򪪪񸡺򪪪򪪪񷚪򪪧򪪪񷪪򪪧򪪪򇚪򪩸򪪪򇢪򪪨򪪪񧢪򪪪򇞆򈪨򊪧񨞆򪆈򈞈񄡦򩥄񨢪𢖆򥐅򪪪񕖪򪪪\n",
   "򪪪򪪪򪪪񺪪򨝨򪪪򊪪򈢈򪪧򪪪񺜶򪩸򪪪򪡺򪢈򪪪򪪪򧝶򪪪򪪪򧝺򪪪򪪪񷝺򪪪򪪪򨡪򪪪򪪪򨞊񸪪򪪇򦞊񶪪򈡨񸢪򇢪򊪇򊪨񨙸򪪨򪪇򈢊򆞪򪪈򪪪򈢪򪪨򪪪򨢊򪪪\n",
 ]
+
+// 3 bits 
+const heartsColor =  ['#53788c', '#8e3d10', '#000000']
+const hearts = ['󛛛󛛛񛛛󛋛񉙉񉋛񛛙󛛉󛙛󛛛󛛛ۛ']
 
 const scorpionColor = ['8a2214', '606070', '50505e', '3f3f4a', '232329', '343448', '43434f', '000000']
 const scorpion = [
@@ -129,10 +130,10 @@ const turtle =[
 ]
 
 
-// font color
-const fontColor = ["fff","000"]
-// number 2-9
-const numberTile= tiles(['񚙖񩖙ɖ', '򥚚򦪚ŕ', '񪙖򩩚ŕ', '񪙖񪙚ɖ', '򚙦򚥕ɪ', '򪙖񪩖ɖ', '򪙖񪙕ɖ', '񪕕񪦩Ʀ', '񪙖񪙖ɖ', '񪙖񪥖ɖ'],2,fontColor,5)
-// font A - Z
-const A2ZTile = tiles(['򙪚񕖩Ʃ', '񪙕񪙕ɕ', '񪙖񪚩ɖ', '񪙕񪖩ɕ', '򪕖򪕕Ŗ', '򪕖򪙕ʩ', '򪕖񪕙ɖ', '񪖩񪕕Ʃ', '񦙖񦚚ɖ', '񦩕򦚚ʕ', '򙦥򙪖ƥ', '򩚩򕚥ŕ', '񙖩񦖙Ʃ', '񩖩񚖙Ʃ', '񩙖񚖙ɖ', '񪙕򦙕ɩ', '񩙕򩙕ʩ', '񚕖񚥖ƪ', '򪕖񪩖ɕ', '񦕕򦚚ƚ', '񪖩񪖩ɖ', '񪖩򙦩ʚ', '񦖩񙖙Ʃ', '򙦩򙪚Ʃ', '񪖩򦩖ƙ', '򚥕򩪚ŕ'],2,fontColor,5)
+// // font color
+// const fontColor = ["fff","000"]
+// // number 2-9
+// const numberTile= tiles(['񚙖񩖙ɖ', '򥚚򦪚ŕ', '񪙖򩩚ŕ', '񪙖񪙚ɖ', '򚙦򚥕ɪ', '򪙖񪩖ɖ', '򪙖񪙕ɖ', '񪕕񪦩Ʀ', '񪙖񪙖ɖ', '񪙖񪥖ɖ'],2,fontColor,5)
+// // font A - Z
+// const A2ZTile = tiles(['򙪚񕖩Ʃ', '񪙕񪙕ɕ', '񪙖񪚩ɖ', '񪙕񪖩ɕ', '򪕖򪕕Ŗ', '򪕖򪙕ʩ', '򪕖񪕙ɖ', '񪖩񪕕Ʃ', '񦙖񦚚ɖ', '񦩕򦚚ʕ', '򙦥򙪖ƥ', '򩚩򕚥ŕ', '񙖩񦖙Ʃ', '񩖩񚖙Ʃ', '񩙖񚖙ɖ', '񪙕򦙕ɩ', '񩙕򩙕ʩ', '񚕖񚥖ƪ', '򪕖񪩖ɕ', '񦕕򦚚ƚ', '񪖩񪖩ɖ', '񪖩򙦩ʚ', '񦖩񙖙Ʃ', '򙦩򙪚Ʃ', '񪖩򦩖ƙ', '򚥕򩪚ŕ'],2,fontColor,5)
 

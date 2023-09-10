@@ -47,7 +47,7 @@ const appendItem = (a,b)=>(a.push(b),a)
 
 const randWeight = (values, weights) => {
     
-    const random = Math.random();
+    const random = math.random();
     let cumulativeWeight = 0;
   
     for (let i = 0; i < values; i++) {
@@ -57,5 +57,5 @@ const randWeight = (values, weights) => {
       }
     }
 
-    return values;
+    return 0;
 };

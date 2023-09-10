@@ -25,28 +25,34 @@ const initial = _ =>{
     //generatePath(gameObject,temp,128,64,2)
     const StartPlacement = generatePlacement(reXY(128,128))
     
-    Player.pos = reXY(128+upTileGap/10,128-upTileGap)
-    nextLevel(3)
+    Player.pos = reXY(128,108)
+    
     Player.lines = [findNodes(StartPlacement)]
-
-    appendItem(gameObject,StartPlacement)
     appendItem(gameObject,Player)
+    appendItem(gameObject,StartPlacement)
+    
+    nextLevel(level)
 }
 
 // next level create notes 
 const nextLevel = level =>{
+    
     console.log("Next level",level)
+
     for(var i=0;i<test.length*level;i++){
-        
+
         const notes = clone(Note)
-        notes.frameIndex = i+8
+        notes.frameIndex = randIntBetween(0,1)
         notes.AnimationTime.set(0,i*100,randIntBetween(2,4))
-        
+        notes.score = floor(100/test.length*level)+5
         notes.level = level
         
         notesObject.push(notes)
 
     }
+    gameObject.sort((a, b) => {
+        return a.type.localeCompare(b.type); // 降序排序
+    });
 }
 
 // const NewGame=_=>{
@@ -88,7 +94,7 @@ const render = s =>{
             e.forEach(k=>{
                 const lastX = mapLayer.length-1
 
-                const tMap = generateTilemap(reXY(k.pos.x,mapLayer[lastX][0].pos.y+32))
+                const tMap = generateTilemap(reXY(k.pos.x,mapLayer[lastX][0].pos.y+32),mapRate)
 
                 temp.push(tMap)
             })
@@ -101,7 +107,7 @@ const render = s =>{
 
             e.forEach(k=>{
                 
-                const tMap = generateTilemap(reXY(k.pos.x,mapLayer[0][0].pos.y-32))
+                const tMap = generateTilemap(reXY(k.pos.x,mapLayer[0][0].pos.y-32),mapRate)
 
                 temp.push(tMap)
             })
@@ -116,7 +122,7 @@ const render = s =>{
             if(substract(Camera.pos,k.pos).x > halfW/5){
                 
                 const lastX = e.length-1
-                const tMap = generateTilemap(reXY(e[lastX].pos.x+32,k.pos.y))
+                const tMap = generateTilemap(reXY(e[lastX].pos.x+32,k.pos.y),mapRate)
 
                 e.push(tMap)
                 e.splice(j,1)
@@ -127,9 +133,10 @@ const render = s =>{
     gameObject.forEach(e=>{
         if(e.mainFrame==playerPng){
 
-            previousPlayerPos = clone(e)    
+            previousPlayerPos = clone(e)
 
             if(movementIndex){
+                e.score = previousPlayerPos.score
                 gameObject.forEach(j=>{
                     if(j.pos.x<=e.pos.x+5&&j.pos.x>=e.pos.x-5
                         &&j.pos.y<=e.pos.y+5&&j.pos.y>=e.pos.y-5
@@ -141,10 +148,28 @@ const render = s =>{
                             j.remove()
                             e.lines=[checkOnePoint]
                             movementIndex = 0
+                            e.score=0
                             nextLevel(1.2)
                         }else{
                             e.lines= j.lines
                         }
+                    }
+                    if(j.pos.x<=e.pos.x+20&&j.pos.x>=e.pos.x-20
+                        &&j.pos.y<=e.pos.y+10&&j.pos.y>=e.pos.y-10
+                        &&j.type=='Znemy'){
+                        
+                        e.lives += j.ack
+                        
+                        if(e.lives<=0){
+
+                            previousPlayerPos = clone(e)
+                            e.remove()
+                        }else{
+
+                            j.remove()
+
+                        }
+
                     }
                 })
             }
@@ -161,6 +186,22 @@ const render = s =>{
 const notesrender = s => {
     //console.log("note move",notesObject)
     notesObject.forEach(e=>{
+        // distance far away >> disable minus
+        // Aim
+        if(substract(Aim.pos,e.pos).x>50){
+            e.disable = 1
+        }else{
+            e.disable = 0
+        }
+        if(!e.disable&&INKEYIN){
+            if(collisionRect(Aim.pos,Aim.wh,e.pos,e.wh)){
+                score += e.score * 1/distance(Aim.pos,e.pos)
+                previousPlayerPos.score += e.score * 1/distance(Aim.pos,e.pos)
+            }else{
+                score -= e.score
+                previousPlayerPos.score -= e.score
+            }
+        }
         e.update(s)
         if(e.pos.y>halfH/2&&e.pos.x<=15){
             e.remove()
@@ -205,8 +246,8 @@ const loop = _ =>{
         const centerW = w/4
         const centerH = h/2
         const radiusY = 120
-        
-        canvasAlpha(.25)
+
+        canvasAlpha(.45)
         
         ctx.fillRect(0,centerH-radiusY-20,halfW,radiusY+20)
         
@@ -223,14 +264,14 @@ const loop = _ =>{
         ctx.closePath()
 
         notesrender(delta)
-
-        Aim.render()
         ctx.beginPath()
         canvasstrokeStyle("#FFF")
         ctx.strokeRect(centerW-25,centerH-radiusY-5,50,50)
         canvasStroke()
+        Aim.render()
+        Turtle.update(delta)
+        Turtle.render()
         ctx.closePath()
-
         canvasRestore()
     }
 
