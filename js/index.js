@@ -26,32 +26,41 @@ const initial = _ =>{
     const StartPlacement = generatePlacement(reXY(128,128))
     
     Player.pos = reXY(128+upTileGap/10,128-upTileGap)
-
+    nextLevel(3)
     Player.lines = [findNodes(StartPlacement)]
-    notesObject.push(Note)
+
     appendItem(gameObject,StartPlacement)
     appendItem(gameObject,Player)
 }
 
 // next level create notes 
-const nextLevel = _ =>{
-    if(KeyEvent){
-        playChord()
+const nextLevel = level =>{
+    console.log("Next level",level)
+    for(var i=0;i<test.length*level;i++){
+        
+        const notes = clone(Note)
+        notes.frameIndex = i+8
+        notes.AnimationTime.set(0,i*100,randIntBetween(2,4))
+        
+        notes.level = level
+        
+        notesObject.push(notes)
+
     }
 }
 
-const NewGame=_=>{
-    GamePlayObject = []
-    CloudCreate(RandInt(3))
-    player = new Faller(tw/2,th/8,tw/16,th/16,10)
-    returnButton=null
-    startButton=null
-    level = 1
-    key1.p=0
-    key1.m=1
-    removetutorialTimes=0
-    CanPlaysong("song1")
-}
+// const NewGame=_=>{
+//     GamePlayObject = []
+//     CloudCreate(RandInt(3))
+//     player = new Faller(tw/2,th/8,tw/16,th/16,10)
+//     returnButton=null
+//     startButton=null
+//     level = 1
+//     key1.p=0
+//     key1.m=1
+//     removetutorialTimes=0
+//     CanPlaysong("song1")
+// }
 
 // camera position and player 
 let centerPos = clone(Basic)
@@ -132,6 +141,7 @@ const render = s =>{
                             j.remove()
                             e.lines=[checkOnePoint]
                             movementIndex = 0
+                            nextLevel(1.2)
                         }else{
                             e.lines= j.lines
                         }
@@ -223,9 +233,13 @@ const loop = _ =>{
 
         canvasRestore()
     }
+
+
+    // Player start to move
     if(!notesObject.length){
         movementIndex=1
     }
+
     // --------
 
     requestAnimationFrame(loop)

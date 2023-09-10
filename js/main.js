@@ -7,7 +7,7 @@ const l = window.localStorage;
 const timer = performance
 const initialXY = reXY(0,0)
 
-let gameObject = mapLayer= notesObject = [],second=0
+let gameObject = mapLayer= notesObject = [],second=0,level
 
 const speedStep = 1,speed = 50
 
@@ -29,7 +29,7 @@ const backgroundMap = tiles(backGround,3,backgroundTileColor,8)
 const pathTemp = tiles(pathTile,3,backgroundTileColor,8)
 const pathPng = pathTemp.concat([rotateImage(pathTemp[1],90),rotateImage(pathTemp[2],90)])
 
-const playerPng = tiles(palyerTile,5,playerColor,16)
+const playerPng = tiles(playDone,4,playDoneColor,16,1)
 
 
 // Draw Image  ( Main ) 
@@ -71,7 +71,6 @@ const Timer = {
         this.StartTime = 0
     },
     check:function(){
-        console.log("check")
         this.StartTime<this.EndTime?this.add():this.reset()
     }
 }
@@ -84,6 +83,8 @@ const Basic = {
     AnimationTime: clone(Timer),
     frameIndex:0,
     direct:0,
+    lives: 3,
+    ack:-3,
     lines:[],
     initial:function(){
         this.showTime.set(0,1,0.05)
@@ -113,28 +114,38 @@ const Line = clone(Basic)
 const Tilemap = clone(Basic)
 const Camera = clone(Basic)
 const Player = clone(Basic)
-const Button = clone(Basic)
-const Note = clone(Basic)
-const Aim = clone(Basic)
+const Enemy = clone(Basic)
+const Item = clone(Basic)
 
+const Note = clone(Basic)
+
+
+// UI
+const Button = clone(Basic)
+const Aim = clone(Basic)
+const Turtle = clone(Basic)
+
+// Map
 Tilemap.mainFrame = backgroundMap
 Tilemap.update=function(e){
     this.vpos = dot(this.vpos,-e*speed)
     this.pos = add(this.vpos,this.pos)
 }
 
+// Node
 Placement.mainFrame = pathPng
 Placement.created= 0
 Placement.type = "Node"
 Placement.initial()
 
+// Path
 Line.mainFrame = pathPng
 Line.initial()
 
+// Player
+
 Player.mainFrame = playerPng
-
 Player.moveToPlacement = 0
-
 Player.update=function(s){
     //console.log(this.vpos,this.pos)
     var moveToEnd = 0
@@ -148,7 +159,7 @@ Player.update=function(s){
             tempPos = this.lines[this.moveToPlacement].pos
             moveToEnd = 1
         }
-
+        this.frameIndex = 1
         if(distance(this.pos,tempPos)<=2&&moveToEnd){
             //console.log(" At the end")
         }
@@ -160,6 +171,7 @@ Player.update=function(s){
     this.pos = add(this.pos,this.vpos)
 }
 
+// camera follow
 Camera.update=function(e){
     this.vpos = substract(this.vpos,this.pos)
     this.vpos = dot(this.vpos,e*speed*.01)

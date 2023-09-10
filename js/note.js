@@ -1,6 +1,6 @@
 
-
-Aim.mainFrame = pathPng
+// UI view
+Aim.mainFrame = numberTile
 Aim.frameIndex = 0
 Aim.vpos = reXY(quW-size,quH+quH/3)
 Aim.pos = reXY(quW,quH+quH/2)
@@ -14,10 +14,14 @@ Aim.render=function(){
 
 
 Note.disable = 0
-Note.mainFrame = pathPng
-
+Note.mainFrame = A2ZTile
+Note.level = 1
 Note.update = function(e){
-    this.vpos = add(this.vpos,reXY(e*0.5,0))
+    if(this.AnimationTime.StartTime<this.AnimationTime.EndTime){
+        this.AnimationTime.check()
+    }else{
+        this.vpos = add(this.vpos,reXY(e*0.5*this.level,0))
+    }
     this.pos.x = quW + (quW-20) * math.cos(this.vpos.x)-10;
     this.pos.y = halfH/2 - 120 * math.sin(this.vpos.x);
 }
