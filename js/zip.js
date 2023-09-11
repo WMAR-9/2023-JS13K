@@ -157,11 +157,13 @@ const AllTiles = {
   }
 }
 
-const black = "000"
+const white = "aaa"
 const red = "a00"
 const green = "0a0"
+const grey = "333"
+const blue ="8df"
 // font color red,green
-const fontColor = [[black,black],[red,red],[green,green]]
+const fontColor = [[white,white],[red,red],[green,green],[grey,grey],[blue,blue]]
 
 // number 2-9
 const numberTile = fontColor.map(e=>tiles(['񚙖񩖙ɖ', '򥚚򦪚ŕ', '񪙖򩩚ŕ', '񪙖񪙚ɖ', '򚙦򚥕ɪ', '򪙖񪩖ɖ', '򪙖񪙕ɖ', '񪕕񪦩Ʀ', '񪙖񪙖ɖ', '񪙖񪥖ɖ'],2,e,5))
@@ -170,4 +172,13 @@ const numberTile = fontColor.map(e=>tiles(['񚙖񩖙ɖ', '򥚚򦪚ŕ', '񪙖򩩚
 const A2ZTile = fontColor.map(e=>tiles(['򙪚񕖩Ʃ', '񪙕񪙕ɕ', '񪙖񪚩ɖ', '񪙕񪖩ɕ', '򪕖򪕕Ŗ', '򪕖򪙕ʩ', '򪕖񪕙ɖ', '񪖩񪕕Ʃ', '񦙖񦚚ɖ', '񦩕򦚚ʕ', '򙦥򙪖ƥ', '򩚩򕚥ŕ', '񙖩񦖙Ʃ', '񩖩񚖙Ʃ', '񩙖񚖙ɖ', '񪙕򦙕ɩ', '񩙕򩙕ʩ', '񚕖񚥖ƪ', '򪕖񪩖ɕ', '񦕕򦚚ƚ', '񪖩񪖩ɖ', '񪖩򙦩ʚ', '񦖩񙖙Ʃ', '򙦩򙪚Ʃ', '񪖩򦩖ƙ', '򚥕򩪚ŕ'],2,e,5))
 
 
+// key initial 
+let key= {},key1={},checkButton=[],startButton,returnButton,INKEYIN=0
+let keyStopRestart=['r','p'],mouseCanvas,addScore=1
 
+// initial key dict
+keyStopRestart.forEach(e=>key1[e]=0)
+
+
+// view 
+let barWidthSizeCount = 0

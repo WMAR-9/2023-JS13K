@@ -11,14 +11,14 @@ const initialXY = reXY(0,0)
 let gameObject = mapLayer= notesObject = [],second=0,level =1,score=0
 
 // map appear rate 
-const mapRate = [max(.5,.8-level*.01),.2,min(.05,.01*level),min(level*.01,.02)]
+let mapRate = [max(.5,.8-level*.01),.2,min(.15,.01*level),min(level*.01,.1)]
 
 // enemy appear rate
 
-const enemyRate = [
-    max(.05,.2-level*.2),
+let enemyRate = [
+    max(.05,.2-level*.5),
     max(.2,.3-level*.1),
-    min(.4,.3+level*.1),
+    min(.4,.1+level*.1),
     min(.3,0+level*.05),
     min(.1,0+level*.01),
 ]
@@ -31,7 +31,6 @@ const halfW=canvas.width = 1024
 const halfH=canvas.height = 800
 const quW = halfW/4
 const quH = halfH/4
-
 
 // PNG size
 const size = 32
@@ -53,7 +52,7 @@ const playUpTemp = tiles(AllTiles.playerUp.pattern1,5,AllTiles.playerUp.color,zi
 const playDoneTemp = tiles(AllTiles.playerDone.pattern1,5,AllTiles.playerDone.color,zipSize,1)
 const playerPng = playStandTemp.concat(playUpTemp).concat(playDoneTemp)
 
-const SpiderPng = tiles(AllTiles.spider.pattern1,4,AllTiles.spider.color,zipSize)
+const SpiderPng = tiles(AllTiles.spider.pattern1,3,AllTiles.spider.color,zipSize)
 const SnakePng = tiles(AllTiles.snake.pattern1,4,AllTiles.snake.color,zipSize)
 const ScorpionPng = tiles(AllTiles.scorpion.pattern1,4,AllTiles.scorpion.color,zipSize,1)
 const TurtlePng = tiles(AllTiles.turtle.pattern1,4,AllTiles.turtle.color,zipSize,1)
@@ -210,9 +209,13 @@ Player.update=function(s){
         // select path 
         
         for(var i =0;i<this.lines.length;i++){
-            if(this.score>=this.lines[i].score&&this.score<=this.lines[i].score+gap){
+            if(score>=this.lines[i].score){
                 this.moveToPlacement = i
             }
+        }
+        
+        if(this.moveToPlacement>=this.lines.length){
+            this.moveToPlacement = this.lines.length-1
         }
 
         let tempPos = reXY(this.pos.x,this.lines[this.moveToPlacement].pos.y)
@@ -222,6 +225,7 @@ Player.update=function(s){
             // now move to endpos
             tempPos = this.lines[this.moveToPlacement].pos
             moveToEnd = 1
+
         }
 
         this.vpos = set(tempPos)
@@ -245,11 +249,13 @@ Player.update=function(s){
         }
 
     }else{
+
         for(var i =0;i<3;i++){
             if(this.AnimationTime.StartTime>1/3*i){
                 this.frameIndex = i
             }
         }
+
     }
     this.AnimationTime.check()
     this.vpos = dot(this.vpos,s*speed*.03)
@@ -266,11 +272,6 @@ Camera.update=function(e){
 Camera.render=_=>{}
 
 
-Turtle.mainFrame = TurtlePng
-Turtle.pos = reXY(halfW/4-100/2,halfH/2-90)
-Turtle.wh = reXY(100,100)
-Turtle.initial()
-
 Scorpion.mainFrame = ScorpionPng
 Scorpion.ack = -1
 Scorpion.initial()
@@ -279,7 +280,7 @@ Snake.mainFrame = SnakePng
 Snake.ack = -2
 Snake.initial()
 
-Spider.mainFrame = Spider
+Spider.mainFrame = SpiderPng
 Spider.ack = -3
 Spider.initial()
 
@@ -287,6 +288,13 @@ Heart.mainFrame = heartsPng
 Heart.ack = 1
 Heart.initial()
 
+Button.mainFrame = SpiderPng
+Button.wh = reXY(16,16)
+
+Turtle.mainFrame = TurtlePng
+Turtle.pos = reXY(halfW/4-100/2,halfH/2-90)
+Turtle.wh = reXY(100,100)
+Turtle.initial()
 //  random gen background
 const generateTilemap = (pos,rate=[.8,.2]) =>{
     // rate [.7,.1,.1,.2]
@@ -317,7 +325,7 @@ const generatePath = (arr,item,distX,distY,count=3)=>{
     const enemy = [0,Heart,Scorpion,Snake,Spider]
 
     const distBetweenFirst = 32
-    const countPath = distX/distBetweenFirst
+    const countPath = floor(distX/distBetweenFirst)
 
     for(var i =0;i<countPath;i++){
         const cl = generatePathmap(reXY(item.pos.x-distBetweenFirst*i,item.pos.y))
@@ -329,8 +337,8 @@ const generatePath = (arr,item,distX,distY,count=3)=>{
     firstPlacement.pos = item.pos
     appendItem(arr,firstPlacement)
 
-    //const odd = count%2?0:distY/2
-    const firstY = firstPlacement.pos.y-((count/2)|0)*distY
+    const odd = count%2?0:distY/2
+    const firstY = firstPlacement.pos.y-(floor(count/2))*distY+odd
 
     // Y Path
     for(var i=0;i<count*2-1;i++){
@@ -346,7 +354,7 @@ const generatePath = (arr,item,distX,distY,count=3)=>{
         const y = firstY+i*distY
         
         // X Path
-        for(var j=1;j<=distance/size;j++){
+        for(var j=1;j<=floor(distance/size);j++){
             const cl = generatePathmap(reXY(firstPlacement.pos.x+j*size,y))
 
             appendItem(arr,cl)
@@ -362,7 +370,7 @@ const generatePath = (arr,item,distX,distY,count=3)=>{
         // Enemy or item 
         const chooseIndex = randWeight(enemy.length,enemyRate)
         if(chooseIndex){
-            const enemyNode = clone(enemy[chooseIndex])
+            const enemyNode = clone(enemy[max(1,chooseIndex)])
             enemyNode.pos = reXY(x,y)
             enemyNode.type = "Znemy"
             enemyNode.wh = set(firstPlacement.wh)
@@ -371,6 +379,7 @@ const generatePath = (arr,item,distX,distY,count=3)=>{
         }
         appendItem(arr,cn) 
     }
+    firstPlacement.lines.sort((a,b)=>a.score>b.score)
 }
 
 const findNodes = node =>{
@@ -385,9 +394,9 @@ const findNodes = node =>{
         node.lines = [startPath]
         node.create=1
 
-        generatePath(gameObject,startPath,gapSize,64,4)
+        generatePath(gameObject,startPath,gapSize,64,max(1,floor(level)))
 
-        console.log("LINES >",startPath.lines)
+        //console.log("LINES >",startPath.lines)
 
         return startPath
     }

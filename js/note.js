@@ -26,9 +26,11 @@ Note.update = function(e){
 Note.render = function(e){
     canvasSave()
     if(this.disable){
-        canvasAlpha(.25)
+        canvasAlpha(.2)
     }
     canvasDraw(this.mainFrame[this.frameIndex],this.pos,this.wh)
+    this.pos.x += this.wh.x/2
+    this.pos.y += this.wh.y/2
     canvasRestore()
 }
 Note.remove = function(){

@@ -1,7 +1,5 @@
 let audioCtx = null
 
-const initialAudioCtx = _ =>(audioCtx=new (window.AudioContext || window.webkitAudioContext)())
-
 let oscillators = []
 let isPlaying = false
 let index = 0
@@ -109,7 +107,7 @@ const song1 = {
             5,5,5,6,3,2,1,1,
             6,6,1,2,5,6,5,3,
             2,1
-        ],1,.01
+        ],.5,.01
         ],
         [
             3,2,2,triad,[
@@ -144,7 +142,10 @@ const playSound = song =>{
     if(isPlaying)return
     oscillators = soundInitial()
     isPlaying=true
-    audioCtx?0:initialAudioCtx()
+    if(!audioCtx){
+        audioCtx=new (window.AudioContext || window.webkitAudioContext)()
+    }
+
     console.log(`canloop: song>`,song)
 
     song.forEach((e,i)=>{
@@ -262,9 +263,11 @@ const createPcmData=(frequencyStart, frequencyEnd, attackTime, decayTime, sustai
 
 const rightPcmData =createPcmData(mainFreq[5], mainFreq[7], .1,.1,0, .1,.3,.1)
 const leftPcmData =createPcmData(mainFreq[7], mainFreq[5], .1,.1,0, .1,.3,.1)
-function playPcmData(pcmData) {
 
-  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+function playPcmData(pcmData) {
+  if(!audioContext){
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
   let audioBuffer = audioContext.createBuffer(1, pcmData.length, sampleRate);
   audioBuffer.copyToChannel(pcmData, 0);
 

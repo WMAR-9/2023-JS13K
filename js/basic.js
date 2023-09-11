@@ -31,7 +31,7 @@ const substract=(a,b)=>reXY(a.x-b.x,a.y-b.y)
 const comp=(a,b)=>a.x==b.x&&a.y==b.y
 const collisionRect=(a,as,b,bs)=>(a.x+as.x>b.x&&b.x+bs.x>a.x&&a.y+as.y>b.y&&b.y+bs.y>a.y)?1:0
 const clone = a =>{
-    if (a === null || typeof a !== 'object' || a instanceof Image) {
+    if (a == null || typeof a != 'object' || a instanceof Image) {
         return a;
     }
     const b = Array.isArray(a)?[]:{};
@@ -44,6 +44,9 @@ const clone = a =>{
 const distance=(a,b)=>math.hypot(a.x-b.x,a.y-b.y);
 const removeItem = (a,b)=>a.filter(e=>e!=b)
 const appendItem = (a,b)=>(a.push(b),a)
+
+const Pad=a=>a.padStart(5,"0")
+const IntToString=a=>a.toString()
 
 const randWeight = (values, weights) => {
     
