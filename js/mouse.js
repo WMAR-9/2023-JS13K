@@ -34,7 +34,9 @@ onfocus=e=>{
 onmousedown=e=>{
 
     if(!e.button){
-        //ClickWindowToKeyIn(e.pageX)
+        // let x= e.clientX - mouseCanvas.left
+        // ClickWindowToKeyIn(x)
+        // console.log(x)
         if(previousPlayerPos!=null&&previousPlayerPos.lives<=0&&INKEYIN){
             initial()
             INKEYIN = 0
@@ -90,6 +92,7 @@ onkeydown=e=>{
     }
 }
 onkeyup=e=>{
+
 }
 
 canvas.addEventListener('click',WaitClickPlayMusic)

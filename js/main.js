@@ -65,10 +65,19 @@ const rightAndLeftPng = rightTemp.concat([rotateImage(rightTemp[0],180)])
 
 const aimPng = tiles(AllTiles.aims.pattern1,3,AllTiles.aims.color,zipSize)
 
+const image = new Image();
 
+image.onload = function() {
+  // Now that the image is loaded, you can safely draw it on the canvas.
+  
+};
+// Set the image source to start loading it.
+image.src = './d.png';
 
 // Draw Image  ( Main ) 
-const canvasDraw=(f,a,b)=>ctx.drawImage(f,a.x,a.y,b.x,b.y)
+const canvasDraw=(f,a,b)=>{
+    if(f)ctx.drawImage(f,a.x,a.y,b.x,b.y)
+}
 const canvasMoveTo=a=>ctx.moveTo(a.x,a.y)
 const canvasLineTo=a=>ctx.lineTo(a.x,a.y)
 const canvasArcTo=(a,b,r)=>ctx.arcTo(a.x,a.y,b.x,b.y,r)
@@ -454,10 +463,14 @@ StartClick.render = function(e){
     
     this.AnimationTime.check()
     canvasAlpha(this.AnimationTime.StartTime)
-    const text = "CLICK ANY TO STAPT"
+    let text = "CLICK ANY TO STAPT"
 
-    DrawText([text],A2ZTile[0],A2ZTile[1],reXY(halfH/2.5,halfH-quH/2),reXY(24,0),reXY(20,20))
+    DrawText([text],A2ZTile[0],A2ZTile[1],reXY(halfH/2.8,halfH-quH/2),reXY(24,0),reXY(20,20))
     
+    canvasAlpha(1)
+    const pattern = "W        W"
+    text  = [pattern,"W KNIGHT W",pattern,pattern,pattern,pattern,pattern,pattern,pattern]
+    DrawText(text,A2ZTile[0],A2ZTile[1],reXY(quW-100,quH/2),reXY(70,64),reXY(64,64))
     
     // for(var i=0;i<text.length;i++){
     //     let pos = reXY(halfH/2.5+i*24,halfH-quH/2)

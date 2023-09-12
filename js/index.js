@@ -27,7 +27,7 @@ const initial = _ =>{
     // temp.pos = set({x:128,y:128})
     //generatePath(gameObject,temp,128,64,2)
     const StartPlacement = generatePlacement(reXY(128,quH))
-    Player.lives = 0
+    Player.lives = 5
     Player.pos = reXY(128,quH)
     
     Player.lines = [findNodes(StartPlacement)]
@@ -42,14 +42,14 @@ const nextLevel = level =>{
     
     //console.log("Next level",level)
     
-    barWidthSizeCount = test.length*level
+    barWidthSizeCount = 8 *level
 
-    for(var i=0;i<test.length*level;i++){
+    for(var i=0;i<8*level;i++){
 
         const notes = clone(Note)
         notes.frameIndex = randIntBetween(0,1)
         notes.AnimationTime.set(0,i*100,randIntBetween(2,4))
-        notes.score = floor(100/(test.length*level))
+        notes.score = floor(100/(8*level))
         notes.level = min(level*.8,2)
         
         notesObject.push(notes)
@@ -241,7 +241,7 @@ const notesrender = s => {
     })
 }
 
-
+mouseCanvas = canvas.getBoundingClientRect();
 // start game
 const loop = _ =>{
     
@@ -254,7 +254,7 @@ const loop = _ =>{
     // resize window 
     canvas.width = 1024
     canvas.height = 800
-    mouseCanvas = canvas.getBoundingClientRect();
+    
     ctx.clearRect(0,0,halfW,halfH)
 
     const hw = halfW/2
