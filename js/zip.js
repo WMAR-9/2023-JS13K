@@ -112,10 +112,9 @@ const AllTiles = {
       size: [16,3] 
   },
   rightAndLeft:{
-      color:['1c1c39', '606070', 'ed9829', 'f3d748', '43434f', '000000'],
+      color:['ed9829', '43434f', 'f3d748', '000000'],
       pattern1: [
-        "𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶒤𶶶󡦶𶶒񦶶𒛌𶶶󉡦𶒛񤶶򛛉𶶶󙉤𶲛񡦶𒛙𶶶󙡦𶶒񦶶𶒜𶶶򔦶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶",
-        "𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶򶶶𶴢𶶶񣒶𶶴󒶶𴌋򶶶􉛚𶶡󛚶𴡉󖶶􉋛𶶴񛚖𶡡򖶶𡡛𶶶𚖶𶴌𶶶𤒶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶𶶶",
+        [,,,1,1,0,0,,,,,,1,,1,2,0,0,,,,1,,1,,2,2,0,0,,1,,1,,,2,2,2,0,0,,1,,,,2,2,2,2,0,,1,,,,2,2,2,2,0,1,,1,,,2,2,2,0,0,,1,,1,,2,2,0,0,,,,1,,1,2,0,0,,,,,,1,1,0,0,,,]
       ],
       size: [16,3] 
   },
@@ -144,7 +143,7 @@ const AllTiles = {
       size: [16,4]
   },
   hearts:{
-      color:['53788c', '8e3d10', '000000'],
+      color:['000', '8e3d10', '000'],
       pattern1: ['󛛛󙛛񋛋󙉙󉉋񉛛󛛛󛛙󛛛󛛛󛛛ۛ', '󛛛󛛛󛛛󛛛󋛋񙉛񋛉󛙉󛉋󙛛󛛛ۛ'],
       size: [9,3]
   },
@@ -154,16 +153,17 @@ const AllTiles = {
         "񶶶𶱒𶶶򉑶𶶱랶󙲖𞶶𒦶𶞴𶛶𦶴𞛶𶦦𴶶𴓜𶶴򦦶𶑔򶶶򢤑𶶶򢢶𶴴𦶶𣲦𶶦󜴶𦶞𴶶󶶞𤦳𶞴󳶶𛱎𶶶򑛶𶳙𶶶𲉖涶"
       ],
       size: [16,3]
-  }
+  },
 }
 
 const white = "aaa"
-const red = "a00"
+const red = "8e3d10"
 const green = "0a0"
 const grey = "333"
 const blue ="8df"
+const yellow = "f3d748"
 // font color red,green
-const fontColor = [[white,white],[red,red],[green,green],[grey,grey],[blue,blue]]
+const fontColor = [[white,white],[red,red],[green,green],[grey,grey],[blue,blue],[yellow,yellow]]
 
 // number 2-9
 const numberTile = fontColor.map(e=>tiles(['񚙖񩖙ɖ', '򥚚򦪚ŕ', '񪙖򩩚ŕ', '񪙖񪙚ɖ', '򚙦򚥕ɪ', '򪙖񪩖ɖ', '򪙖񪙕ɖ', '񪕕񪦩Ʀ', '񪙖񪙖ɖ', '񪙖񪥖ɖ'],2,e,5))
@@ -174,7 +174,7 @@ const A2ZTile = fontColor.map(e=>tiles(['򙪚񕖩Ʃ', '񪙕񪙕ɕ', '񪙖񪚩ɖ'
 
 // key initial 
 let key= {},key1={},checkButton=[],startButton,returnButton,INKEYIN=0
-let keyStopRestart=['r','p'],mouseCanvas,addScore=1
+let keyStopRestart=['r','p'],mouseCanvas,addScore=1,Pause=0,PlayGoodOrNot=2
 
 // initial key dict
 keyStopRestart.forEach(e=>key1[e]=0)
@@ -182,3 +182,4 @@ keyStopRestart.forEach(e=>key1[e]=0)
 
 // view 
 let barWidthSizeCount = 0
+let showTurialView = 0

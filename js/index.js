@@ -3,10 +3,13 @@
 const initial = _ =>{
     const curH = halfH/size/2
     const curW = halfW/size/2
+    Camera.pos = initialXY
+    ExplainBoard.showTime.set(0,3,.01)
+    Pause= showTurialView = 0  
     gameObject = [Camera]
     mapLayer = []
     notesObject = []
-
+    level = 1
     // map layer
     for(var j =0;j<=curH+2;j++){
         const temp = []
@@ -24,7 +27,7 @@ const initial = _ =>{
     // temp.pos = set({x:128,y:128})
     //generatePath(gameObject,temp,128,64,2)
     const StartPlacement = generatePlacement(reXY(128,quH))
-    
+    Player.lives = 0
     Player.pos = reXY(128,quH)
     
     Player.lines = [findNodes(StartPlacement)]
@@ -47,13 +50,13 @@ const nextLevel = level =>{
         notes.frameIndex = randIntBetween(0,1)
         notes.AnimationTime.set(0,i*100,randIntBetween(2,4))
         notes.score = floor(100/(test.length*level))
-        notes.level = min(level*.8,3)
+        notes.level = min(level*.8,2)
         
         notesObject.push(notes)
 
     }
     gameObject.sort((a, b) => {
-        return a.type.localeCompare(b.type); // 降序排序
+        return a.type.localeCompare(b.type)
     });
 }
 
@@ -62,12 +65,12 @@ let centerPos = clone(Basic)
 let previousPlayerPos
 
 const render = s =>{
-    mapRate = [max(.5,.8-level*.01),.2,min(.2,.1*level),min(level*.1,.2)]
+    mapRate = [max(.5,.6-level*.01),.2,min(.1,.03*level),min(level*.03,.2)]
     enemyRate = [
-        max(.05,.2-level*.5),
-        max(.2,.3-level*.1),
-        min(.4,.1+level*.1),
-        min(.3,0+level*.05),
+        max(.05,.4-level*.5),
+        max(.2,.4-level*.1),
+        min(.4,.2+level*.1),
+        min(.3,.1+level*.05),
         min(.2,0+level*.05),
     ]
     // set camera move
@@ -131,6 +134,10 @@ const render = s =>{
             
             if(movementIndex && addScore){
                 e.score += max(score,0)
+                
+                if(score>=70){
+                    e.lives = min(e.lives+1,12)
+                }
                 addScore=0
             }
 
@@ -152,7 +159,7 @@ const render = s =>{
                             movementIndex = 0
                             addScore=1
                             score = 0
-                            level+=0.4
+                            level+=0.5
                             nextLevel(level)
                         }else{
                             e.lines= j.lines
@@ -162,7 +169,7 @@ const render = s =>{
                         &&j.pos.y<=e.pos.y+10&&j.pos.y>=e.pos.y-10
                         &&j.type=='Znemy'){
                         
-                        e.lives += j.ack
+                        e.lives = min(e.lives+j.ack,12)
                         
                         if(e.lives<=0){
 
@@ -187,8 +194,9 @@ const render = s =>{
     
 }
 const touch = rORl =>{
+    if(!showTurialView)return;
     if(!notesObject.length)return;
-    //console.log("CLICK")
+
     let findLastNotes = 0
     let minValue = 99999
     notesObject.forEach((e,index)=>{
@@ -198,16 +206,14 @@ const touch = rORl =>{
             findLastNotes = index
         }
     })
-
+    Aim.initial()
+    Aim.nameIndex = 1
     const notesIndex = notesObject[findLastNotes]
     if(!notesIndex.disable){
         if(collisionRect(Aim.pos,Aim.wh,notesIndex.pos,notesIndex.wh)&&notesIndex.frameIndex==rORl){
 
             score += notesIndex.score
-
-        }else{
-
-            score -= notesIndex.score
+            Aim.nameIndex = 0
 
         }
         score = max(score,0)
@@ -224,9 +230,8 @@ const notesrender = s => {
         
         if(substract(Aim.pos,e.pos).x>50){
             
-            score -= e.disable?0:e.score
-            previousPlayerPos.score -= e.disable?0:e.score
-            
+            // score -= e.disable?0:e.score
+            // previousPlayerPos.score -= e.disable?0:e.score
             e.disable = 1 
         }
         if(e.pos.y>halfH/2&&e.pos.x<=40){
@@ -256,97 +261,122 @@ const loop = _ =>{
     
     // game start view
     // start View INKEYIN = 1  > start when click anywhere
-    if(INKEYIN){
+    if(!INKEYIN){
+
+        StartClick.render(delta)
 
     }else{
         // main game loop
-        canvasSave()
-        canvasScale(2)
-        render(delta)
-        canvasRestore()
-
-        canvasScale(2)
-
-        if(!movementIndex){
-            // UI and Note View 
-            //stopChord()
+        if(!Pause){
             canvasSave()
-            
-            canvasFillStyle("#92535e")
-            const notesCurrentIsEnable = max(0,barWidthSizeCount - (notesObject.filter(e =>e.disable==0).length))
-            const normWidth = barWidthSizeCount?hw/barWidthSizeCount:0
-
-            ctx.fillRect(0,0,hw-(notesCurrentIsEnable*normWidth),5)
-            
-            const centerW = quW
-            const centerH = halfH/2
-            const radiusY = 120
-
-            canvasAlpha(.5)
-            
-            ctx.fillRect(0,centerH-radiusY-20,halfW,radiusY+20)
-            
-            canvasAlpha(1)
-
-            ctx.setLineDash([9])
-            ctx.beginPath()
-            ctx.ellipse(centerW, centerH, centerW, radiusY, 0, PI, 2 * PI);
-            ctx.stroke()
-            ctx.closePath()
-            ctx.beginPath()
-            ctx.ellipse(centerW, centerH, centerW-55, radiusY-40, 0,PI, 2 * PI);
-            ctx.stroke()
-            ctx.closePath()
-
-            notesrender(delta)
-            //ctx.beginPath()
-            //canvasstrokeStyle("#FFF")
-            //ctx.strokeRect(centerW-25,centerH-radiusY-5,50,50)
-            //canvasStroke()
-            Aim.render()
-            Turtle.update(delta)
-            Turtle.render()
-        }
-
-        // UI Board
-        const board = ["SCOPE","QATH"]
-        
-        for(var i=0;i<previousPlayerPos.lives;i++){
-            const pos = reXY(i*size,8)
-            const wh = reXY(size,size)
-            canvasDraw(heartsPng[0],pos,wh)
-        }
-
-        board.forEach((e,j)=>{
-            for(var i=0;i<e.length;i++){
-                let pos = reXY(5+i*16-2,40+40*j-2)
-                const wh = reXY(12,12)
-                canvasDraw(A2ZTile[3][e[i].charCodeAt(0)-65],pos,wh)
-                pos = reXY(5+i*16,40+40*j)
-                canvasDraw(A2ZTile[4][e[i].charCodeAt(0)-65],pos,wh)
+            canvasScale(2)
+            render(delta)
+            canvasRestore()
+            if(previousPlayerPos.lives<=0){
+                EndView.render(delta)
             }
-        })
 
-        let text =  Pad(IntToString(floor(max(previousPlayerPos.score,0))))
-        let wh = reXY(12,12)
-        for(var l=0;l<text.length;l++){
-            let pos = reXY(10+l*upTileGap,56)
-            canvasDraw(numberTile[3][text[l].charCodeAt(0)-48],pos,wh)
-            pos = reXY(10+l*upTileGap-2,56-2)
-            canvasDraw(numberTile[0][text[l].charCodeAt(0)-48],pos,wh)
-        }
-        text =  Pad(IntToString(floor(max(score,0))))
-        for(var l=0;l<text.length;l++){
-            let pos = reXY(10+l*upTileGap,96)
-            canvasDraw(numberTile[3][text[l].charCodeAt(0)-48],pos,wh)
-            pos = reXY(10+l*upTileGap-2,96-2)
-            canvasDraw(numberTile[0][text[l].charCodeAt(0)-48],pos,wh)
-        }
+            if(!showTurialView){
 
-        canvasRestore()
-        // Player start to move
-        if(!notesObject.length){
-            movementIndex=1
+                ExplainBoard.render(delta)
+
+            }else{
+                canvasScale(2)
+
+                if(!movementIndex){
+
+                    // UI and Note View 
+                    //stopChord()
+                    canvasSave()
+                    
+                    canvasFillStyle("#92535e")
+
+                    // upper bar
+                    const notesCurrentIsEnable = max(0,barWidthSizeCount - (notesObject.filter(e =>e.disable==0).length))
+                    const normWidth = barWidthSizeCount?hw/barWidthSizeCount:0
+
+                    ctx.fillRect(0,0,hw-(notesCurrentIsEnable*normWidth),5)
+                    
+                    const centerW = quW
+                    const centerH = halfH/2
+                    const radiusY = 120
+
+                    canvasAlpha(.5)
+                    
+                    ctx.fillRect(0,centerH-radiusY-20,halfW,radiusY+20)
+                    
+                    canvasAlpha(1)
+
+                    ctx.setLineDash([9])
+                    ctx.beginPath()
+                    ctx.ellipse(centerW, centerH, centerW, radiusY, 0, PI, 2 * PI);
+                    ctx.stroke()
+                    ctx.closePath()
+                    ctx.beginPath()
+                    ctx.ellipse(centerW, centerH, centerW-55, radiusY-40, 0,PI, 2 * PI);
+                    ctx.stroke()
+                    ctx.closePath()
+
+                    notesrender(delta)
+                    //ctx.beginPath()
+                    //canvasstrokeStyle("#FFF")
+                    //ctx.strokeRect(centerW-25,centerH-radiusY-5,50,50)
+                    //canvasStroke()
+                    Aim.render()
+                    Turtle.update(delta)
+                    Turtle.render()
+                }
+
+                // UI Board  "SCOPE",
+                const board = ["POUTE"]
+                
+                for(var i=0;i<12;i++){
+                    const pos = reXY(i*size,8)
+                    const wh = reXY(size,size)
+                    if(previousPlayerPos.lives>i){
+                        canvasDraw(heartsPng[0],pos,wh)
+                    }else{
+                        canvasDraw(heartsBlackPng[0],pos,wh)
+                    }
+                }
+                //DrawText(board,A2ZTile[3],A2ZTile[4],initialXY,reXY(12),5)
+                board.forEach((e,j)=>{
+                    for(var i=0;i<e.length;i++){
+                        let pos = reXY(5+i*16-2,60+40*j-2)
+                        const wh = reXY(12,12)
+                        const asciiCode = e[i].charCodeAt(0)-65
+                        canvasDraw(A2ZTile[3][asciiCode],pos,wh)
+                        pos = reXY(5+i*16,60+40*j)
+                        canvasDraw(A2ZTile[4][asciiCode],pos,wh)
+                    }
+                })
+
+                // let text =  Pad(IntToString(floor(max(previousPlayerPos.score,0))))
+                // let wh = reXY(12,12)
+                // for(var l=0;l<text.length;l++){
+                //     let pos = reXY(10+l*upTileGap,56)
+                //     canvasDraw(numberTile[3][text[l].charCodeAt(0)-48],pos,wh)
+                //     pos = reXY(10+l*upTileGap-2,56-2)
+                //     canvasDraw(numberTile[0][text[l].charCodeAt(0)-48],pos,wh)
+                // }
+
+                let text =  Pad(IntToString(floor(max(score,0))))
+                let wh = reXY(12,12)
+                for(var l=0;l<text.length;l++){
+                    let pos = reXY(upTileGap+l*upTileGap,80)
+                    canvasDraw(numberTile[3][text[l].charCodeAt(0)-48],pos,wh)
+                    pos = reXY(upTileGap+l*upTileGap-2,80-2)
+                    canvasDraw(numberTile[0][text[l].charCodeAt(0)-48],pos,wh)
+                }
+
+                canvasRestore()
+                // Player start to move
+                if(!notesObject.length){
+                    movementIndex=1
+                }
+            }
+        }else{
+            PauseView.render(delta)
         }
     }
     // --------

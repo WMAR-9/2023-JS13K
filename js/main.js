@@ -58,10 +58,14 @@ const ScorpionPng = tiles(AllTiles.scorpion.pattern1,4,AllTiles.scorpion.color,z
 const TurtlePng = tiles(AllTiles.turtle.pattern1,4,AllTiles.turtle.color,zipSize,1)
 
 const heartsPng = tiles(AllTiles.hearts.pattern1,3,AllTiles.hearts.color,9)
+const heartsBlackPng = tiles(AllTiles.hearts.pattern1,3,['000', '333', '000'],9)
 
-const rightAndLeftPng = tiles(AllTiles.rightAndLeft.pattern1,3,AllTiles.rightAndLeft.color,zipSize)
+const rightTemp =tiles(AllTiles.rightAndLeft.pattern1,3,AllTiles.rightAndLeft.color,10,1)
+const rightAndLeftPng = rightTemp.concat([rotateImage(rightTemp[0],180)])
 
 const aimPng = tiles(AllTiles.aims.pattern1,3,AllTiles.aims.color,zipSize)
+
+
 
 // Draw Image  ( Main ) 
 const canvasDraw=(f,a,b)=>ctx.drawImage(f,a.x,a.y,b.x,b.y)
@@ -85,6 +89,25 @@ const canvasClose=_=>ctx.closePath()
 // Set local memory 
 const localSet=(e,a)=>l.setItem(e,a)
 const localGet=e=>l.getItem(e)
+
+
+const DrawText = (arr,tile1,tile2,locationPos,gap,wh,ascii=65) =>{
+    arr.forEach((e,j)=>{
+        for(var i=0;i<e.length;i++){
+            
+            let pos = reXY(locationPos.x+i*gap.x,locationPos.y+j*gap.y)
+
+            const asciiCode = e[i].charCodeAt(0)-ascii
+            
+            if(asciiCode>=0){
+                
+                canvasDraw(tile1[asciiCode],pos,wh)
+                pos = substract(pos,reXY(2,2))
+                canvasDraw(tile2[asciiCode],pos,wh)
+            }
+        }
+    })
+}
 
 const Timer = {
     StartTime:1,
@@ -116,7 +139,7 @@ const Basic = {
     frameIndex:0,
     score:0,
     direct:0,
-    lives: 3,
+    lives: 0,
     ack:0,
     type:"Z",
     lines:[],
@@ -143,7 +166,14 @@ const Basic = {
         canvasAlpha(this.showTime.StartTime)
         // show number score
         if(this.ack!=0 && this.mainFrame!=playerPng){
-
+            let text =  Pad(IntToString(floor(max(this.score,0))),2)
+            let wh = reXY(12,12)
+            for(var l=0;l<text.length;l++){
+                let pos = substract(this.pos,reXY(-4+-l*upTileGap,14))
+                canvasDraw(numberTile[3][text[l].charCodeAt(0)-48],pos,wh)
+                pos = substract(this.pos,reXY(-3+-l*upTileGap,16))
+                canvasDraw(numberTile[this.ack<0?1:5][text[l].charCodeAt(0)-48],pos,wh)
+            }
         }
         if(this.type=='Node'||this.type=='Line'){
             canvasDraw(this.mainFrame[this.frameIndex],reXY(this.pos.x-this.wh.x/32,this.pos.y+this.wh.y/2),this.wh)
@@ -175,6 +205,10 @@ const Note = clone(Basic)
 const Button = clone(Basic)
 const Aim = clone(Basic)
 const Turtle = clone(Basic)
+const ExplainBoard = clone(Basic)
+const StartClick = clone(Basic)
+const PauseView = clone(Basic)
+const EndView = clone(Basic)
 
 
 // Map
@@ -288,13 +322,182 @@ Heart.mainFrame = heartsPng
 Heart.ack = 1
 Heart.initial()
 
-Button.mainFrame = SpiderPng
-Button.wh = reXY(16,16)
-
 Turtle.mainFrame = TurtlePng
-Turtle.pos = reXY(halfW/4-100/2,halfH/2-90)
-Turtle.wh = reXY(100,100)
-Turtle.initial()
+Turtle.wh = reXY(84,84)
+Turtle.pos = reXY(halfW/4-Turtle.wh.x/2,halfH/2-80)
+
+Turtle.AnimationTime.set(0,1,.02)
+
+
+// UI view
+Aim.mainFrame = aimPng
+Aim.frameIndex = 0
+Aim.nameIndex= 2
+Aim.vpos = reXY(quW-size,quH+quH/3)
+Aim.pos = reXY(quW,quH+quH/2)
+Aim.wh = reXY(64,64)
+Aim.render=function(e){
+
+    if(Aim.AnimationTime.StartTime<Aim.AnimationTime.EndTime){
+        Aim.AnimationTime.add()
+    }
+
+    canvasSave()
+
+    if(Aim.AnimationTime.StartTime>Aim.AnimationTime.EndTime){
+        this.nameIndex=2
+    }
+
+    let temp = this.nameIndex
+    if(temp<=1){
+        const word = ["NICE","FOOL"]
+        DrawText([word[temp]],A2ZTile[3],A2ZTile[4],substract(this.vpos,reXY(+2,upTileGap)),reXY(20,0),reXY(14,14))
+    }
+
+    canvasDraw(this.mainFrame[this.frameIndex],this.vpos,this.wh)
+    canvasRestore()
+}
+Aim.AnimationTime.set(1,1,1)
+
+Note.disable = 0
+Note.mainFrame = rightAndLeftPng
+Note.level = 1
+Note.update = function(e){
+    if(this.AnimationTime.StartTime<this.AnimationTime.EndTime){
+        this.AnimationTime.check()
+    }else{
+        this.vpos = add(this.vpos,reXY(e*0.5*this.level,0))
+    }
+    this.pos.x = quW + (quW-20) * math.cos(this.vpos.x)-10;
+    this.pos.y = halfH/2 - 120 * math.sin(this.vpos.x);
+}
+Note.render = function(e){
+    canvasSave()
+    if(this.disable){
+        canvasAlpha(.2)
+    }
+    canvasDraw(this.mainFrame[this.frameIndex],this.pos,this.wh)
+    this.pos.x += this.wh.x/2
+    this.pos.y += this.wh.y/2
+    canvasRestore()
+}
+Note.remove = function(){
+    notesObject = removeItem(notesObject,this)
+}
+
+Button.wh =  reXY(20,20)
+Button.mainFrame = pathPng
+
+
+const CharChBoard = [Heart,Scorpion,Snake,Spider,Turtle].map(e=>{
+    const temp = clone(e)
+    temp.wh =reXY(64,64)
+    temp.ack = 0
+    temp.vpos = reXY(0,0)
+    temp.initial()
+    temp.AnimationTime.set(0,1,.03)
+    return temp
+})
+
+const CharChBoardText = [
+                        "GIVE YOU ONE HEAPTS",
+                        "STAB TT MINUS ONE",
+                        "BITE TT MINUS TWO",
+                        "BITE MINUS THPEE",
+                        "I AM JENY IF U PLAY GOOD",
+                        "I WILL GIVE U HEAPTS YY",
+                        "PATH IS CHOOSEN BY SCOPES",
+                        "LEFT AND PIGHT NOTES KEY"
+]
+
+ExplainBoard.wh = dot(reXY(quW,quH),3)
+ExplainBoard.pos = reXY(quW/2,quH/2)
+ExplainBoard.showTime.set(0,3,.01)
+ExplainBoard.render = function(s){
+    canvasSave()
+    canvasFillStyle("#333")
+    canvasFillRect(substract(this.pos,reXY(-4,-4)),this.wh)
+    canvasFillStyle("#33b48b")
+    canvasFillRect(this.pos,this.wh)
+    CharChBoard.forEach((e,j)=>{
+            let pos = reXY(150,quH/2+80*j)
+            e.pos =pos
+            e.update(0)
+            e.render(1)
+    })
+
+    DrawText(CharChBoardText,A2ZTile[0],A2ZTile[3],reXY(quW,quH/1.7),reXY(24,80),reXY(20,20))
+    // CharChBoardText.forEach((e,j)=>{
+    //     for(var i=0;i<e.length;i++){
+    //         let pos = reXY(quW+i*24-2,quH/1.7+80*j-2)
+    //         const wh = reXY(20,20)
+            
+    //         const asciiCode = e[i].charCodeAt(0)-65
+    //         if(asciiCode<0)continue;
+    //         canvasDraw(A2ZTile[0][asciiCode],pos,wh)
+    //         pos = reXY(quW+i*24,quH/1.7+80*j)
+    //         canvasDraw(A2ZTile[3][asciiCode],pos,wh)
+    //     }
+    // })
+    if(this.showTime.StartTime>this.showTime.EndTime){
+        showTurialView = 1
+    }
+    this.showTime.add(s)
+    canvasRestore()
+}
+
+StartClick.wh = reXY(quW,quH)
+StartClick.pos = initialXY
+StartClick.render = function(e){
+
+    canvasSave()
+    
+    this.AnimationTime.check()
+    canvasAlpha(this.AnimationTime.StartTime)
+    const text = "CLICK ANY TO STAPT"
+
+    DrawText([text],A2ZTile[0],A2ZTile[1],reXY(halfH/2.5,halfH-quH/2),reXY(24,0),reXY(20,20))
+    
+    
+    // for(var i=0;i<text.length;i++){
+    //     let pos = reXY(halfH/2.5+i*24,halfH-quH/2)
+    //     const wh = reXY(20,20)
+    //     const asciiCode = text[i].charCodeAt(0)-65
+    //     if(asciiCode<0)continue
+    //     canvasDraw(A2ZTile[0][asciiCode],pos,wh)
+    //     pos = reXY(halfH/2.5+i*24-2,halfH-quH/2-2)
+    //     canvasDraw(A2ZTile[1][asciiCode],pos,wh)
+    // }
+    canvasRestore()
+}
+StartClick.AnimationTime.set(0,1.5,.01)
+
+PauseView.render=e=>{
+    canvasSave()
+    canvasAlpha(.5)
+    canvasFillStyle("#333")
+    canvasFillRect(initialXY,reXY(halfW,halfH))
+    const text = "TOT QAUSE TOT"
+
+    DrawText([text],A2ZTile[0],A2ZTile[1],reXY(quW/4,halfH/2),reXY(70,0),reXY(64,64))
+    canvasRestore()
+}
+EndView.render=e=>{
+    canvasSave()
+    canvasAlpha(.5)
+    canvasFillStyle("#333")
+    canvasFillRect(initialXY,reXY(halfW,halfH))
+    let text = "ZZ YOU LOSE ZZ"
+    DrawText([text],A2ZTile[0],A2ZTile[1],reXY(32,halfH/2),reXY(70,0),reXY(64,64))
+    
+    text = ["BEST SCOPE ","","CLICK P TO PESTAPT"]
+    DrawText(text,A2ZTile[0],A2ZTile[1],reXY(halfH/2.5,halfH-quH/2),reXY(24,24),reXY(20,20))
+    text = [Pad(IntToString(max(floor(previousPlayerPos.score),0)),5)]
+    DrawText(text,numberTile[0],numberTile[1],reXY(halfH/1.3,halfH-quH/2),reXY(24,0),reXY(20,20),48)
+
+    canvasRestore()
+}
+
 //  random gen background
 const generateTilemap = (pos,rate=[.8,.2]) =>{
     // rate [.7,.1,.1,.2]

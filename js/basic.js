@@ -45,7 +45,7 @@ const distance=(a,b)=>math.hypot(a.x-b.x,a.y-b.y);
 const removeItem = (a,b)=>a.filter(e=>e!=b)
 const appendItem = (a,b)=>(a.push(b),a)
 
-const Pad=a=>a.padStart(5,"0")
+const Pad=(a,b=5,c="0")=>a.padStart(b,c)
 const IntToString=a=>a.toString()
 
 const randWeight = (values, weights) => {

@@ -204,13 +204,16 @@ const playChord=_=>{
     playSound(song1[songList[index]])
 }
 
+const keepPlayChord=_=>{
+    if(!isPlaying){
+        audioCtx.resume()
+        isPlaying = true
+    }
+}
 const stopChord=_=>{
     if(isPlaying){
         audioCtx.suspend()
         isPlaying = false
-    }else{
-        audioCtx.resume()
-        isPlaying = true
     }
 }
 //playSound(song1[songList1[index]],audioCtxBackgroud)
@@ -261,8 +264,8 @@ const createPcmData=(frequencyStart, frequencyEnd, attackTime, decayTime, sustai
 // const noteDuration = .1 // 音符總持續時間（秒）
 // const volume = .1; // 音量
 
-const rightPcmData =createPcmData(mainFreq[5], mainFreq[7], .1,.1,0, .1,.3,.1)
-const leftPcmData =createPcmData(mainFreq[7], mainFreq[5], .1,.1,0, .1,.3,.1)
+const rightPcmData =createPcmData(mainFreq[5], mainFreq[3], .1,.1,0, .1,.3,.1)
+const leftPcmData =createPcmData(mainFreq[3], mainFreq[5], .1,.1,0, .1,.3,.1)
 
 function playPcmData(pcmData) {
   if(!audioContext){
