@@ -2,7 +2,7 @@
 ## The Knight
 
 ### ISSUE
-- Cause render error,Image do not load finished   `Fixed: Image onload = _ => {} `
+- Cause render error,Image do not load finished   `Problem at rotate PNG Need> Fixed: Image onload = _ => {} `
 - Too late to find this error
 
 ![Play GUI](image-1.png)
